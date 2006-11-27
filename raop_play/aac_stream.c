@@ -17,7 +17,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-#include <asm/types.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -95,7 +94,7 @@ int aac_open(auds_t *auds, char *fname)
 	aac->fname=(char *)malloc(strlen(fname)+1);
 	if(!aac->fname) goto erexit;
 	strcpy(aac->fname,fname);
-	aac->buffer=(__u8 *)malloc(MAX_SAMPLES_IN_CHUNK*4+16);
+	aac->buffer=(u_int8_t *)malloc(MAX_SAMPLES_IN_CHUNK*4+16);
 	if(!aac->buffer) goto erexit;
 	auds->sigchld_cb=sigchld_callback;
 	auds->sample_rate=DEFAULT_SAMPLE_RATE;
@@ -125,7 +124,7 @@ int aac_close(auds_t *auds)
 	return 0;
 }
 
-int aac_get_top_sample(auds_t *auds, __u8 **data, int *size)
+int aac_get_top_sample(auds_t *auds, u_int8_t **data, int *size)
 {
 	aac_t *aac=(aac_t *)auds->stream;
 	stop_decoder(aac);
@@ -134,7 +133,7 @@ int aac_get_top_sample(auds_t *auds, __u8 **data, int *size)
 }
 
 
-int aac_get_next_sample(auds_t *auds, __u8 **data, int *size)
+int aac_get_next_sample(auds_t *auds, u_int8_t **data, int *size)
 {
 	aac_t *aac=(aac_t *)auds->stream;
 	data_source_t ds={.type=STREAM, .u.inf=aac->inf};

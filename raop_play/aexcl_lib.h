@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <asm/types.h>
 #include <sys/time.h>
 #include <time.h>
 #include <stdlib.h>
@@ -85,16 +84,16 @@ static inline int realloc_memory(void **p, int newsize, const char *func)
 	return 0;
 }
 
-#define GET_BIGENDIAN_INT(x) (*(__u8*)(x)<<24)|(*((__u8*)(x)+1)<<16)|(*((__u8*)(x)+2)<<8)|(*((__u8*)(x)+3))
+#define GET_BIGENDIAN_INT(x) (*(u_int8_t*)(x)<<24)|(*((u_int8_t*)(x)+1)<<16)|(*((u_int8_t*)(x)+2)<<8)|(*((u_int8_t*)(x)+3))
 
 typedef struct key_data_t {
-	__u8 *key;
-	__u8 *data;
+	u_int8_t *key;
+	u_int8_t *data;
 }key_data_t;
 
 
 int open_tcp_socket(char *hostname, unsigned short *port);
-int get_tcp_connect_by_host(int sd, char *host, __u16 destport);
+int get_tcp_connect_by_host(int sd, char *host, u_int16_t destport);
 int get_tcp_connect(int sd, struct sockaddr_in dest_addr);
 int bind_host(int sd, char *hostname, unsigned long ulAddr,unsigned short *port);
 int read_line(int fd, char *line, int maxlen, int timeout, int no_poll);

@@ -48,9 +48,9 @@ typedef struct auds_t {
 #ifdef AUDIO_STREAM_C
 	SRC_STATE *resamp_st;
 	SRC_DATA resamp_sd;
-	__u16 *resamp_buf;
+	u_int16_t *resamp_buf;
 #else
-	__u32 dummy;
+	u_int32_t dummy;
 #endif
 } auds_t;
 
@@ -62,7 +62,7 @@ typedef enum data_source_type_t {
 }data_source_type_t;
 typedef struct mem_source_t {
 	int size;
-	__s16 *data;
+	int16_t *data;
 }mem_source_t;
 typedef struct data_source_t {
 	data_source_type_t type;
@@ -85,9 +85,9 @@ typedef struct data_source_t {
 
 auds_t *auds_open(char *fname, data_type_t adt);
 int auds_close(auds_t *auds);
-int auds_get_top_sample(auds_t *auds, __u8 **data, int *size);
-int auds_get_next_sample(auds_t *auds, __u8 **data, int *size);
-int auds_write_pcm(auds_t *auds, __u8 *buffer, __u8 **data, int *size,
+int auds_get_top_sample(auds_t *auds, u_int8_t **data, int *size);
+int auds_get_next_sample(auds_t *auds, u_int8_t **data, int *size);
+int auds_write_pcm(auds_t *auds, u_int8_t *buffer, u_int8_t **data, int *size,
 		   int bsize, data_source_t *ds);
 int auds_sigchld(auds_t *auds, siginfo_t *siginfo);
 int aud_clac_chunk_size(int sample_rate);
@@ -97,7 +97,7 @@ int auds_poll_next_sample(auds_t *auds);
 /* write bits filed data, *bpos=0 for msb, *bpos=7 for lsb
    d=data, blen=length of bits field
  */
-static inline void bits_write(__u8 **p, __u8 d, int blen, int *bpos)
+static inline void bits_write(u_int8_t **p, u_int8_t d, int blen, int *bpos)
 {
 	int lb,rb,bd;
 	lb=7-*bpos;

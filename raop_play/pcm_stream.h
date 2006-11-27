@@ -25,16 +25,16 @@ typedef struct pcm_t {
 /* private variables */
 #ifdef PCM_STREAM_C_
 	int dfd;
-	__u8 *buffer;
+	u_int8_t *buffer;
 #else
-	__u32 dummy;
+	u_int32_t dummy;
 #endif
 } pcm_t;
 
 
 int pcm_open(auds_t *auds, char *fname);
 int pcm_close(auds_t *auds);
-int pcm_get_next_sample(auds_t *auds, __u8 **data, int *size);
+int pcm_get_next_sample(auds_t *auds, u_int8_t **data, int *size);
 int pcm_poll_next_sample(auds_t *auds);
 
 #endif

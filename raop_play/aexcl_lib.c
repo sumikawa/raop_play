@@ -68,7 +68,7 @@ int get_tcp_connect(int sd, struct sockaddr_in dest_addr)
 }
 
 
-int get_tcp_connect_by_host(int sd, char *host, __u16 destport)
+int get_tcp_connect_by_host(int sd, char *host, u_int16_t destport)
 {
 	struct sockaddr_in addr;
 	struct hostent *h;

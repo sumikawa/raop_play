@@ -27,18 +27,18 @@ typedef struct ogg_t {
 #ifdef OGG_STREAM_C
 	FILE *inf;
 	int dpid;
-	__u8 *buffer;
+	u_int8_t *buffer;
 	char *fname;
 #else
-	__u32 dummy;
+	u_int32_t dummy;
 #endif
 } ogg_t;
 
 
 int ogg_open(auds_t *auds, char *fname);
 int ogg_close(auds_t *auds);
-int ogg_get_top_sample(auds_t *auds, __u8 **data, int *size);
-int ogg_get_next_sample(auds_t *auds, __u8 **data, int *size);
+int ogg_get_top_sample(auds_t *auds, u_int8_t **data, int *size);
+int ogg_get_next_sample(auds_t *auds, u_int8_t **data, int *size);
 
 
 #endif

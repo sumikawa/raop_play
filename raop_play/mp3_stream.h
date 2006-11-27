@@ -27,18 +27,18 @@ typedef struct mp3_t {
 #ifdef MP3_STREAM_C
 	int dfd;
 	int dpid;
-	__u8 *buffer;
+	u_int8_t *buffer;
 	char *fname;
 #else
-	__u32 dummy;
+	u_int32_t dummy;
 #endif
 } mp3_t;
 
 
 int mp3_open(auds_t *auds, char *fname);
 int mp3_close(auds_t *auds);
-int mp3_get_top_sample(auds_t *auds, __u8 **data, int *size);
-int mp3_get_next_sample(auds_t *auds, __u8 **data, int *size);
+int mp3_get_top_sample(auds_t *auds, u_int8_t **data, int *size);
+int mp3_get_next_sample(auds_t *auds, u_int8_t **data, int *size);
 
 
 #endif

@@ -18,7 +18,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 #include <netinet/in.h>
-#include <asm/types.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -71,7 +70,7 @@ static void sigchld_callback(void *p, siginfo_t *siginfo)
 static int read_header(auds_t *auds, char *fname)
 {
 	FILE *inf;
-	__u8 head[128], tmp;
+	u_int8_t head[128], tmp;
 	int rsize,i;
 	unsigned int j;
 	
@@ -139,7 +138,7 @@ int flac_open(auds_t *auds, char *fname)
 	flac->fname=(char *)malloc(strlen(fname)+1);
 	if(!flac->fname) goto erexit;
 	strcpy(flac->fname,fname);
-	flac->buffer=(__u8 *)malloc(MAX_SAMPLES_IN_CHUNK*4+16);
+	flac->buffer=(u_int8_t *)malloc(MAX_SAMPLES_IN_CHUNK*4+16);
 	if(!flac->buffer) goto erexit;
 	auds->sigchld_cb=sigchld_callback;
 	if(access(FIFO_NAME,F_OK) && mkfifo(FIFO_NAME,0600)<0){
@@ -170,7 +169,7 @@ int flac_close(auds_t *auds)
 	return 0;
 }
 
-int flac_get_top_sample(auds_t *auds, __u8 **data, int *size)
+int flac_get_top_sample(auds_t *auds, u_int8_t **data, int *size)
 {
 	flac_t *flac=(flac_t *)auds->stream;
 	stop_decoder(flac);
@@ -178,7 +177,7 @@ int flac_get_top_sample(auds_t *auds, __u8 **data, int *size)
 	return flac_get_next_sample(auds, data, size);
 }
 
-int flac_get_next_sample(auds_t *auds, __u8 **data, int *size)
+int flac_get_next_sample(auds_t *auds, u_int8_t **data, int *size)
 {
 	flac_t *flac=(flac_t *)auds->stream;
 	data_source_t ds={.type=STREAM, .u.inf=flac->inf};

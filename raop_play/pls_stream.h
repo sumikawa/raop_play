@@ -29,7 +29,7 @@ typedef struct pls_t {
 	int index;
 	FILE *inf;
 #else
-	__u32 dummy;
+	u_int32_t dummy;
 #endif
 } pls_t;
 

@@ -21,12 +21,12 @@
 #ifndef __RTSP_CLIENT_H_
 #define __RTSP_CLIENT_H
 
-typedef struct rtspcl_t {__u32 dummy;} rtspcl_t;
+typedef struct rtspcl_t {u_int32_t dummy;} rtspcl_t;
 
 rtspcl_t *rtspcl_open();
 int rtspcl_close(rtspcl_t *p);
 int rtspcl_set_useragent(rtspcl_t *p, const char *name);
-int rtspcl_connect(rtspcl_t *p, char *host, __u16 destport, char *sid);
+int rtspcl_connect(rtspcl_t *p, char *host, u_int16_t destport, char *sid);
 char* rtspcl_local_ip(rtspcl_t *p);
 int rtspcl_disconnect(rtspcl_t *p);
 int rtspcl_annouce_sdp(rtspcl_t *p, char *sdp);
@@ -38,7 +38,7 @@ int rtspcl_teardown(rtspcl_t *p);
 int rtspcl_remove_all_exthds(rtspcl_t *p);
 int rtspcl_add_exthds(rtspcl_t *p, char *key, char *data);
 int rtspcl_mark_del_exthds(rtspcl_t *p, char *key);
-__u16 rtspcl_get_server_port(rtspcl_t *p);
+u_int16_t rtspcl_get_server_port(rtspcl_t *p);
 
 
 #endif

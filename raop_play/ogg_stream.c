@@ -17,7 +17,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-#include <asm/types.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -67,21 +66,21 @@ static void sigchld_callback(void *p, siginfo_t *siginfo)
 }
 
 typedef struct vorbis_head_t{
-	__u8 packtype;
-	__u8 name[6];
-	__u32 version;
-	__u8 channel;
-	__u32 rate;
-	__u32 bitrate_upper;
-	__u32 bitrate_nominal;
-	__u32 bitrate_lower;
-	__u32 blocksize[2];
+	u_int8_t packtype;
+	u_int8_t name[6];
+	u_int32_t version;
+	u_int8_t channel;
+	u_int32_t rate;
+	u_int32_t bitrate_upper;
+	u_int32_t bitrate_nominal;
+	u_int32_t bitrate_lower;
+	u_int32_t blocksize[2];
 }__attribute__ ((packed)) vorbis_head_t;
 
 static int read_header(auds_t *auds, char *fname)
 {
 	FILE *inf;
-	__u8 head[1024];
+	u_int8_t head[1024];
 	vorbis_head_t *vh;
 	int rsize,i,j;
 	
@@ -120,7 +119,7 @@ int ogg_open(auds_t *auds, char *fname)
 	ogg->fname=(char *)malloc(strlen(fname)+1);
 	if(!ogg->fname) goto erexit;
 	strcpy(ogg->fname,fname);
-	ogg->buffer=(__u8 *)malloc(MAX_SAMPLES_IN_CHUNK*4+16);
+	ogg->buffer=(u_int8_t *)malloc(MAX_SAMPLES_IN_CHUNK*4+16);
 	if(!ogg->buffer) goto erexit;
 	auds->sigchld_cb=sigchld_callback;
 	if(access(FIFO_NAME,F_OK) && mkfifo(FIFO_NAME,0600)<0){
@@ -151,7 +150,7 @@ int ogg_close(auds_t *auds)
 	return 0;
 }
 
-int ogg_get_top_sample(auds_t *auds, __u8 **data, int *size)
+int ogg_get_top_sample(auds_t *auds, u_int8_t **data, int *size)
 {
 	ogg_t *ogg=(ogg_t *)auds->stream;
 	stop_decoder(ogg);
@@ -159,7 +158,7 @@ int ogg_get_top_sample(auds_t *auds, __u8 **data, int *size)
 	return ogg_get_next_sample(auds, data, size);
 }
 
-int ogg_get_next_sample(auds_t *auds, __u8 **data, int *size)
+int ogg_get_next_sample(auds_t *auds, u_int8_t **data, int *size)
 {
 	ogg_t *ogg=(ogg_t *)auds->stream;
 	data_source_t ds={.type=STREAM, .u.inf=ogg->inf};

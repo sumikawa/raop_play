@@ -20,7 +20,7 @@
 #ifndef __RAOP_CLIENT_H_
 #define __RAOP_CLIENT_H
 
-typedef struct raopcl_t {__u32 dummy;} raopcl_t;
+typedef struct raopcl_t {u_int32_t dummy;} raopcl_t;
 
 typedef enum pause_state_t{
 	NO_PAUSE=0,
@@ -30,9 +30,9 @@ typedef enum pause_state_t{
 
 raopcl_t *raopcl_open();
 int raopcl_close(raopcl_t *p);
-int raopcl_connect(raopcl_t *p, char *host,__u16 destport);
+int raopcl_connect(raopcl_t *p, char *host,u_int16_t destport);
 int raopcl_disconnect(raopcl_t *p);
-int raopcl_send_sample(raopcl_t *p, __u8 *sample, int count );
+int raopcl_send_sample(raopcl_t *p, u_int8_t *sample, int count );
 int raopcl_update_volume(raopcl_t *p, int vol);
 int raopcl_sample_remsize(raopcl_t *p);
 int raopcl_set_pause(raopcl_t *p, pause_state_t pause);

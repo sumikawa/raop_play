@@ -189,7 +189,7 @@ int main(int argc, char *argv[])
 	int rval=-1,i;
 	int size;
 	int volume=100;
-	__u8 *buf;
+	u_int8_t *buf;
 	int iact=0;
 	struct sigaction act;
 

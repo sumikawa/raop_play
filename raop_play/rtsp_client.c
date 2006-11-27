@@ -35,7 +35,7 @@ typedef struct rtspcl_data_t {
 	key_data_t *exthds;
 	char *session;
 	char *transport;
-	__u16 server_port;
+	u_int16_t server_port;
 	struct in_addr host_addr;
 	struct in_addr local_addr;
 	const char *useragent;
@@ -66,7 +66,7 @@ int rtspcl_close(rtspcl_t *p)
 	return 0;
 }
 
-__u16 rtspcl_get_server_port(rtspcl_t *p)
+u_int16_t rtspcl_get_server_port(rtspcl_t *p)
 {
 	rtspcl_data_t *rtspcld;
 	
@@ -148,9 +148,9 @@ int rtspcl_remove_all_exthds(rtspcl_t *p)
 	return 0;
 }
 
-int rtspcl_connect(rtspcl_t *p, char *host, __u16 destport, char *sid)
+int rtspcl_connect(rtspcl_t *p, char *host, u_int16_t destport, char *sid)
 {
-	__u16 myport=0;
+	u_int16_t myport=0;
 	struct sockaddr_in name;
 	socklen_t namelen=sizeof(name);
 	rtspcl_data_t *rtspcld;
@@ -209,8 +209,8 @@ int rtspcl_setup(rtspcl_t *p, key_data_t **kd)
 
 	if(!p) return -1;
 	rtspcld=(rtspcl_data_t *)p;
-	hds[0].key=(__u8*)"Transport";
-	hds[0].data=(__u8*)"RTP/AVP/TCP;unicast;interleaved=0-1;mode=record";
+	hds[0].key=(u_int8_t*)"Transport";
+	hds[0].data=(u_int8_t*)"RTP/AVP/TCP;unicast;interleaved=0-1;mode=record";
 	hds[1].key=NULL;
 	if(exec_request(rtspcld, "SETUP", NULL, NULL, 1, hds, &rkd)) return -1;
 	if(!(rtspcld->session=kd_lookup(rkd, "Session"))){
@@ -261,10 +261,10 @@ int rtspcl_record(rtspcl_t *p)
 		ERRMSG("%s: no session in progress\n",__func__);
 		return -1;
 	}
-	hds[0].key=(__u8*)"Range";
-	hds[0].data=(__u8*)"npt=0-";
-        hds[1].key=(__u8*)"RTP-Info";
-	hds[1].data=(__u8*)"seq=0;rtptime=0";
+	hds[0].key=(u_int8_t*)"Range";
+	hds[0].data=(u_int8_t*)"npt=0-";
+        hds[1].key=(u_int8_t*)"RTP-Info";
+	hds[1].data=(u_int8_t*)"seq=0;rtptime=0";
 	hds[2].key=NULL;
 	return exec_request(rtspcld,"RECORD",NULL,NULL,1,hds,&rtspcld->kd);
 }	
@@ -285,8 +285,8 @@ int rtspcl_flush(rtspcl_t *p)
 	
 	if(!p) return -1;
 	rtspcld=(rtspcl_data_t *)p;
-	hds[0].key=(__u8*)"RTP-Info";
-	hds[0].data=(__u8*)"seq=0;rtptime=0";
+	hds[0].key=(u_int8_t*)"RTP-Info";
+	hds[0].data=(u_int8_t*)"seq=0;rtptime=0";
 	hds[1].key=NULL;
 	return exec_request(rtspcld, "FLUSH", NULL, NULL, 1, hds, &rtspcld->kd);
 }

@@ -20,7 +20,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <asm/types.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -38,12 +37,12 @@
 #define AtomSTSC "stsc"
 
 typedef struct m4asd_t {
-	__u8 buf[BUF_SIZE+CROSS_RECOVER_SIZE];
+	u_int8_t buf[BUF_SIZE+CROSS_RECOVER_SIZE];
 	int bufp;
 	int vdata_size;
-	__u8 *sst; // sample size table
-	__u8 *cot; // chunk offset table
-	__u8 *cst; // chunk samples table
+	u_int8_t *sst; // sample size table
+	u_int8_t *cot; // chunk offset table
+	u_int8_t *cst; // chunk samples table
 	int nsst; // number of data in sst
 	int ncot; // number of data in cot
 	int ncst; // number of data in cst
@@ -53,12 +52,12 @@ typedef struct m4asd_t {
 	int cur_cst_index; // current chunk size table index
 	int cur_pos; // current file position
 	int co_size; // chunk offset data size, 4:32 bits, 8:64 bits
-	__u8 *read_data;
+	u_int8_t *read_data;
 	int read_data_size;
 	FILE *inf;
 }m4asd_t;
 
-static inline int big_end_int(__u8 *p)
+static inline int big_end_int(u_int8_t *p)
 {
 	return (*p<<24) | (*(p+1)<<16) | (*(p+2)<<8) | *(p+3);
 }
@@ -103,10 +102,10 @@ static int find_atom_pos(m4asd_t *m4asd, char *atom)
 	return -1;
 }
 
-static int get_atom_data(m4asd_t *m4asd, __u8 **data)
+static int get_atom_data(m4asd_t *m4asd, u_int8_t **data)
 {
 	int dsize, size,cpsize;
-	__u8 *dp;
+	u_int8_t *dp;
 	size=big_end_int(m4asd->buf+m4asd->bufp-4);
 	dsize=size;
 	if(size<8) return -1;
@@ -136,7 +135,7 @@ static int get_atom_data(m4asd_t *m4asd, __u8 **data)
  * sample size at data+12+4*i (big endian)
  * return value : number of data, -1 if error
  */
-static int get_sample_size_table(m4asd_t *m4asd, __u8 **data)
+static int get_sample_size_table(m4asd_t *m4asd, u_int8_t **data)
 {
 	int rval=-1;
 	int size;
@@ -156,7 +155,7 @@ static int get_sample_size_table(m4asd_t *m4asd, __u8 **data)
  *              at data+8+8*i if *co64==1 (32 bits big endian)
  * return value : number of data, -1 if error
  */
-static int get_chunk_offset_table(m4asd_t *m4asd, __u8 **data)
+static int get_chunk_offset_table(m4asd_t *m4asd, u_int8_t **data)
 {
 	int rval=-1;
 	int size;
@@ -182,7 +181,7 @@ static int get_chunk_offset_table(m4asd_t *m4asd, __u8 **data)
  * "number of sample in a chunk" table: data+12+(i*12), (big endian)
  * return value : number of data, -1 if error
  */
-static int get_chunk_samples_table(m4asd_t *m4asd, __u8 **data)
+static int get_chunk_samples_table(m4asd_t *m4asd, u_int8_t **data)
 {
 	int rval=-1;
 	int size;
@@ -199,7 +198,7 @@ static int get_next_pos(m4asd_t *m4asd, int *pos, int *size)
 {
 	int sinc;
 	int next_first_chunk;
-	__u8 *co;
+	u_int8_t *co;
 	
 	if(m4asd->cur_chunk>=m4asd->ncot) return -1;
 	if(!m4asd->cur_pos){
@@ -284,7 +283,7 @@ int m4a_close(auds_t *auds)
 }
 
 
-int m4a_get_top_sample(auds_t *auds, __u8 **data, int *size)
+int m4a_get_top_sample(auds_t *auds, u_int8_t **data, int *size)
 {
 	m4asd_t *m4asd=(m4asd_t *)auds->stream;
 	
@@ -296,7 +295,7 @@ int m4a_get_top_sample(auds_t *auds, __u8 **data, int *size)
 	return m4a_get_next_sample(auds, data, size);
 }
 
-int m4a_get_next_sample(auds_t *auds, __u8 **data, int *size)
+int m4a_get_next_sample(auds_t *auds, u_int8_t **data, int *size)
 {
 	m4asd_t *m4asd=(m4asd_t *)auds->stream;
 	int pos;

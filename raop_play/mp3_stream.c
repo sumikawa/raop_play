@@ -17,7 +17,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-#include <asm/types.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/wait.h>
@@ -101,7 +100,7 @@ static void sigchld_callback(void *p, siginfo_t *siginfo)
 static int read_header(auds_t *auds, char *fname)
 {
 	FILE *inf;
-	__u8 head[4];
+	u_int8_t head[4];
 	int ver, srate;
 	int rnum[3][3]={{44100,48000,32000},
 		      {22050,24000,16000},
@@ -168,7 +167,7 @@ int mp3_open(auds_t *auds, char *fname)
 	mp3->fname=(char *)malloc(strlen(fname)+1);
 	if(!mp3->fname) goto erexit;
 	strcpy(mp3->fname,fname);
-	mp3->buffer=(__u8 *)malloc(MAX_SAMPLES_IN_CHUNK*4+16);
+	mp3->buffer=(u_int8_t *)malloc(MAX_SAMPLES_IN_CHUNK*4+16);
 	if(!mp3->buffer) goto erexit;
 	auds->sigchld_cb=sigchld_callback;
 	auds->sample_rate=DEFAULT_SAMPLE_RATE;
@@ -195,7 +194,7 @@ int mp3_close(auds_t *auds)
 	return 0;
 }
 
-int mp3_get_top_sample(auds_t *auds, __u8 **data, int *size)
+int mp3_get_top_sample(auds_t *auds, u_int8_t **data, int *size)
 {
 	mp3_t *mp3=(mp3_t *)auds->stream;
 	stop_decoder(mp3);
@@ -203,7 +202,7 @@ int mp3_get_top_sample(auds_t *auds, __u8 **data, int *size)
 	return mp3_get_next_sample(auds, data, size);
 }
 
-int mp3_get_next_sample(auds_t *auds, __u8 **data, int *size)
+int mp3_get_next_sample(auds_t *auds, u_int8_t **data, int *size)
 {
 	mp3_t *mp3=(mp3_t *)auds->stream;
 	data_source_t ds={.type=DESCRIPTOR, .u.fd=mp3->dfd};

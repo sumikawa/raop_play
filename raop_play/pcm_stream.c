@@ -19,7 +19,6 @@
  *****************************************************************************/
 #include <unistd.h>
 #include <fcntl.h>
-#include <asm/types.h>
 #include <stdio.h>
 #include <sys/poll.h>
 #define PCM_STREAM_C_
@@ -39,7 +38,7 @@ int pcm_open(auds_t *auds, char *fname)
 	if(pcm->dfd<0) goto erexit;
 	auds->sample_rate=DEFAULT_SAMPLE_RATE;
 	auds->chunk_size=aud_clac_chunk_size(auds->sample_rate);
-	pcm->buffer=(__u8 *)malloc(MAX_SAMPLES_IN_CHUNK*4+16);
+	pcm->buffer=(u_int8_t *)malloc(MAX_SAMPLES_IN_CHUNK*4+16);
 	if(!pcm->buffer) goto erexit;
 	return 0;
  erexit:
@@ -58,14 +57,14 @@ int pcm_close(auds_t *auds)
 	return 0;
 }
 
-int pcm_get_next_sample(auds_t *auds, __u8 **data, int *size)
+int pcm_get_next_sample(auds_t *auds, u_int8_t **data, int *size)
 {
 	int rval;
 	pcm_t *pcm=(pcm_t *)auds->stream;
 	int bsize=auds->chunk_size;
 	data_source_t ds={.type=MEMORY};
-	__u8 *rbuf=NULL;
-	if(!(rbuf=(__u8*)malloc(bsize*4))) return -1;
+	u_int8_t *rbuf=NULL;
+	if(!(rbuf=(u_int8_t*)malloc(bsize*4))) return -1;
 	memset(rbuf,0,bsize*4);
 	/* ds.u.mem.size, ds.u.mem.data */
 	ds.u.mem.size=read(pcm->dfd,rbuf,bsize*4);
@@ -77,7 +76,7 @@ int pcm_get_next_sample(auds_t *auds, __u8 **data, int *size)
 		//INFMSG("%s: too small chunk of data(size=%d), add null data\n",__func__, ds.u.mem.size);
 		ds.u.mem.size=MINIMUM_SAMPLE_SIZE*4;
 	}
-	ds.u.mem.data=(__s16*)rbuf;
+	ds.u.mem.data=(int16_t*)rbuf;
 	bsize=ds.u.mem.size/4;
 	rval=auds_write_pcm(auds, pcm->buffer, data, size, bsize, &ds);
 	free(rbuf);

@@ -20,12 +20,12 @@
 #ifndef __M4A_STREAM_H_
 #define __M4A_STREAM_H_
 
-typedef struct m4a_t {__u32 dummy;} m4a_t;
+typedef struct m4a_t {u_int32_t dummy;} m4a_t;
 
 int m4a_open(auds_t *auds, char *fname);
 int m4a_close(auds_t *auds);
-int m4a_get_top_sample(auds_t *auds, __u8 **data, int *size);
-int m4a_get_next_sample(auds_t *auds, __u8 **data, int *size);
+int m4a_get_top_sample(auds_t *auds, u_int8_t **data, int *size);
+int m4a_get_next_sample(auds_t *auds, u_int8_t **data, int *size);
 
 
 #endif

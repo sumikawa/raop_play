@@ -17,7 +17,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-#include <asm/types.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -37,7 +36,7 @@
 
 
 static data_type_t get_data_type(char *fname);
-static __s16 *pcm_resample(__s16 *ps, SRC_STATE *st, SRC_DATA *sd,
+static int16_t *pcm_resample(int16_t *ps, SRC_STATE *st, SRC_DATA *sd,
 			   data_source_t *ds, int *bsize, int channels);
 
 auds_t *auds_open(char *fname, data_type_t adt)
@@ -94,7 +93,7 @@ auds_t *auds_open(char *fname, data_type_t adt)
 			ERRMSG("can't open libsamplerate\n");
 			goto erexit;
 		}
-		auds->resamp_buf=(__u16*)malloc(MAX_SAMPLES_IN_CHUNK*2*2);
+		auds->resamp_buf=(u_int16_t*)malloc(MAX_SAMPLES_IN_CHUNK*2*2);
 		auds->resamp_sd.data_in=(float *)malloc(sizeof(float)*MAX_SAMPLES_IN_CHUNK*2);
 		auds->resamp_sd.data_out=(float *)malloc(sizeof(float)*MAX_SAMPLES_IN_CHUNK*2);
 		auds->resamp_sd.src_ratio=(double)DEFAULT_SAMPLE_RATE/(double)auds->sample_rate;
@@ -152,7 +151,7 @@ int auds_close(auds_t *auds)
 	return 0;
 }
 
-int auds_get_top_sample(auds_t *auds, __u8 **data, int *size)
+int auds_get_top_sample(auds_t *auds, u_int8_t **data, int *size)
 {
 	if(auds->data_type==AUD_TYPE_PLS){
 		// move to the top song first
@@ -182,7 +181,7 @@ int auds_get_top_sample(auds_t *auds, __u8 **data, int *size)
 	return -1;
 }
 
-int auds_get_next_sample(auds_t *auds, __u8 **data, int *size)
+int auds_get_next_sample(auds_t *auds, u_int8_t **data, int *size)
 {
 	int rval;
 	auds_t *lauds=auds;
@@ -254,19 +253,19 @@ int auds_sigchld(auds_t *auds, siginfo_t *siginfo)
 }
 
 
-int auds_write_pcm(auds_t *auds, __u8 *buffer, __u8 **data, int *size,
+int auds_write_pcm(auds_t *auds, u_int8_t *buffer, u_int8_t **data, int *size,
 		   int bsize, data_source_t *ds)
 {
-	__u8 one[4];
+	u_int8_t one[4];
 	int count=0;
 	int bpos=0;
-	__u8 *bp=buffer;
+	u_int8_t *bp=buffer;
 	int i,nodata=0;
-	__s16 *resamp=NULL, *pr=NULL;
+	int16_t *resamp=NULL, *pr=NULL;
 	int channels=2;
 	if(auds) channels=auds->channels;
 	if(auds && auds->sample_rate != DEFAULT_SAMPLE_RATE){
-		resamp=pcm_resample((__s16*)auds->resamp_buf, auds->resamp_st,
+		resamp=pcm_resample((int16_t*)auds->resamp_buf, auds->resamp_st,
 				    &auds->resamp_sd, ds, &bsize, channels);
 		if(!resamp) return -1;
 		pr=resamp;
@@ -290,16 +289,16 @@ int auds_write_pcm(auds_t *auds, __u8 *buffer, __u8 **data, int *size,
 	while(1){
 		if(pr){
 			if(channels==1)
-				*((__s16*)one)=*pr;
+				*((int16_t*)one)=*pr;
 			else
-				*((__s16*)one)=*pr++;
-			*((__s16*)one+1)=*pr++;
+				*((int16_t*)one)=*pr++;
+			*((int16_t*)one+1)=*pr++;
 		}else {
 			switch(ds->type){
 			case DESCRIPTOR:
 				if(channels==1){
 					if(read(ds->u.fd, one, 2)!=2) nodata=1;
-					*((__s16*)one+1)=*((__s16*)one);
+					*((int16_t*)one+1)=*((int16_t*)one);
 				}else{
 					if(read(ds->u.fd, one, 4)!=4) nodata=1;
 				}
@@ -307,7 +306,7 @@ int auds_write_pcm(auds_t *auds, __u8 *buffer, __u8 **data, int *size,
 			case STREAM:
 				if(channels==1){
 					if(fread(one,1,2,ds->u.inf)!=2) nodata=1;
-					*((__s16*)one+1)=*((__s16*)one);
+					*((int16_t*)one+1)=*((int16_t*)one);
 				}else{
 					if(fread(one,1,4,ds->u.inf)!=4) nodata=1;
 				}
@@ -315,12 +314,12 @@ int auds_write_pcm(auds_t *auds, __u8 *buffer, __u8 **data, int *size,
 			case MEMORY:
 				if(channels==1){
 					if(ds->u.mem.size<=count*2) nodata=1;
-					*((__s16*)one)=ds->u.mem.data[count];
-					*((__s16*)one+1)=*((__s16*)one);
+					*((int16_t*)one)=ds->u.mem.data[count];
+					*((int16_t*)one+1)=*((int16_t*)one);
 				}else{
 					if(ds->u.mem.size<=count*4) nodata=1;
-					*((__s16*)one)=ds->u.mem.data[count*2];
-					*((__s16*)one+1)=ds->u.mem.data[count*2+1];
+					*((int16_t*)one)=ds->u.mem.data[count*2];
+					*((int16_t*)one+1)=ds->u.mem.data[count*2+1];
 				}
 				break;
 			}
@@ -373,7 +372,7 @@ static data_type_t get_data_type(char *fname)
 	return AUD_TYPE_NONE;
 }
 
-static __s16 *pcm_resample(__s16 *ps, SRC_STATE *st, SRC_DATA *sd,
+static int16_t *pcm_resample(int16_t *ps, SRC_STATE *st, SRC_DATA *sd,
 			   data_source_t *ds, int *bsize, int channels)
 {
 	int samples, tsamples=0;

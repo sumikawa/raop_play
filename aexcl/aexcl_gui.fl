@@ -1,0 +1,200 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0105 
+header_name {.h} 
+code_name {.cxx}
+decl {\#include <string.h>
+\#include <stdio.h>
+\#include <stdlib.h>
+\#include "aexcl_lib.h"} {} 
+
+decl {\#include <FL/Fl_Multi_Browser.H>} {public
+} 
+
+decl {\#include "aexcl_play.h"
+\#include <FL/Fl_File_Browser.H>} {public
+} 
+
+decl {\#include "ipod/itunesdb.h"} {public
+} 
+
+decl {\#include "ipod_browser.h"} {public
+} 
+
+class MfBrowser {open : {public Fl_File_Browser}
+} {
+  decl {int cur_selected;} {}
+  decl {int last_selected_line;} {selected public
+  }
+  Function {MfBrowser(int X, int Y, int W, int H, const char *l=0):Fl_File_Browser(X,Y,W,H,l)} {open
+  } {
+    code {cur_selected=0;
+last_selected_line=0;} {}
+  }
+  Function {num_of_selected()} {open return_type int
+  } {
+    code {int count=0;
+void *l=this->item_first();
+while(l){
+  if(this->item_selected(l)) count++;
+  l=this->item_next(l);
+}
+return count;} {}
+  }
+  Function {first_selected()} {open return_type int
+  } {
+    code {int count=0;
+void *l=this->item_first();
+while(l){
+  if(this->item_selected(l)) {
+    cur_selected=count;return count;}
+  l=this->item_next(l);
+  count++;
+}
+return -1;} {}
+  }
+  Function {next_selected()} {open return_type int
+  } {
+    code {int count=cur_selected+1;
+void *l=this->find_line(cur_selected+1);
+if(l) l=this->item_next(l);
+while(l){
+  if(this->item_selected(l)) {
+    cur_selected=count;return count;}
+  l=this->item_next(l);
+  count++;
+}
+return -1;} {}
+  }
+  Function {handle(int event)} {open private return_type int
+  } {
+    code {if (event == FL_ENTER || event == FL_LEAVE) return 1;
+if (event != FL_PUSH) return Fl_File_Browser::handle(event);
+if (Fl::event_state(FL_CTRL|FL_SHIFT)) return Fl_File_Browser::handle(event);
+if(!last_selected_line) return Fl_File_Browser::handle(event);
+
+int X, Y, W, H; bbox(X, Y, W, H);
+int my;
+char whichway;
+if (!Fl::event_inside(X, Y, W, H)) return 0;
+if (Fl::visible_focus()) Fl::focus(this);
+my = Fl::event_y();
+void* l = find_item(my);
+if (l) {
+	whichway = !item_selected(l);
+	Fl_Browser_::select(l, whichway, when() & FL_WHEN_CHANGED);
+	return 1;
+}
+return Fl_File_Browser::handle(event);} {}
+  }
+} 
+
+class AexclGui {open
+} {
+  decl {char dirname[256];} {}
+  decl {int (*control)(aex_cntl_enum_t, int);} {}
+  Function {get_dirname()} {open return_type {char*}
+  } {
+    code {return dirname;} {}
+  }
+  Function {AexclGui(char *fdir, int (*cntl_cb)(aex_cntl_enum_t, int))} {open
+  } {
+    code {strncpy(dirname,fdir,sizeof(dirname));} {}
+    code {control=cntl_cb;} {}
+    Fl_Window main_window {open
+      xywh {4 622 640 480} type Single align 6
+      code0 {o->show();} visible
+    } {
+      Fl_Text_Display {} {
+        label {Airport Express Client Player}
+        xywh {20 30 0 0} box NO_BOX labelfont 1 labelsize 18 align 5
+      }
+      Fl_Button stop {
+        callback {if(!control(AEX_STOP,0)){pause->hide();play->show();}}
+        image {./player_stop.png} xywh {300 13 32 32}
+      }
+      Fl_Button rew {
+        callback {if(control(AEX_PREV_TRACK,0)) {pause->hide();play->show();}}
+        image {./player_rew.png} xywh {345 13 32 32}
+      }
+      Fl_Button play {
+        callback {if(!control(AEX_PLAY,0)) {play->hide();pause->show();}}
+        image {./player_play.png} xywh {390 13 32 32}
+      }
+      Fl_Button pause {
+        callback {if(!control(AEX_PAUSE,0)) {pause->hide();play->show();}}
+        image {./player_pause.png} xywh {390 13 32 32}
+        code0 {o->hide();}
+      }
+      Fl_Button fwd {
+        callback {if(control(AEX_NEXT_TRACK,0)) {pause->hide();play->show();}}
+        image {./player_fwd.png} xywh {435 13 32 32}
+      }
+      Fl_Slider volume {
+        callback {control(AEX_VOL,(int)o->value());}
+        xywh {301 48 166 18} type Horizontal labeltype NO_LABEL when 4 maximum 100 value 90
+      }
+      Fl_Check_Button ipod_mode {
+        label ipod
+        callback {if(o->value()){
+	file_browser->hide();
+	ipod_browser->show();
+}else{
+	file_browser->show();
+	ipod_browser->hide();
+}}
+        xywh {485 10 25 25} down_box DOWN_BOX
+      }
+      Fl_Check_Button repeat {
+        label repeat
+        xywh {485 35 25 25} down_box DOWN_BOX
+      }
+      Fl_Button exit {
+        callback {main_window->~Fl_Window();}
+        image {./exit.png} xywh {595 13 32 32}
+      }
+      Fl_Choice aex_chooser {open
+        xywh {20 35 260 24} down_box BORDER_BOX labeltype NO_LABEL
+      } {}
+      Fl_Output status {
+        xywh {20 452 600 25} labeltype NO_LABEL
+      }
+      Fl_Scroll {} {open
+        xywh {20 70 600 380}
+      } {
+        Fl_File_Browser file_browser {
+          callback {int i;
+	      char *line=(char *)o->text(o->value());
+	      if(o->last_selected_line!=o->value()){
+	      	o->last_selected_line=o->value();
+		return;
+	      }
+	      o->last_selected_line=0;
+	      if(!line) return;
+	      if(line[strlen(line)-1]!='/') return;
+	      if(!strcmp(line,"../") && dirname[strlen(dirname)-1]!='.'){
+		      printf("line is %s\\n",line);
+		      for(i=strlen(dirname);i>0;i--){
+			      if(dirname[i]=='/') {
+				      dirname[i]=0;break;
+			      }
+		      }
+	      }else{
+		      strncat(dirname,"/",sizeof(dirname));
+		      line[strlen(line)-1]=0;
+		      strncat(dirname,line,sizeof(dirname));
+	      }
+	      o->load(dirname);}
+          xywh {20 70 600 380}
+          code0 {o->load(dirname);}
+          code1 {o->type(FL_MULTI_BROWSER);}
+          class MfBrowser
+        }
+        Fl_Browser ipod_browser {
+          user_data status
+          xywh {20 70 600 380} hide
+          class IPodBrowser
+        }
+      }
+    }
+  }
+} 

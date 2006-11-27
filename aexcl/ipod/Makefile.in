@@ -1,0 +1,20 @@
+CC = @CC@
+DEFS = @DEFS@
+LIBS = @LIBS@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+
+GLIB = glib-2.0
+CFLAGS += -I/usr/include/$(GLIB) -I/usr/lib/$(GLIB)/include -I../../raop_play
+CFLAGS += -DGLIB_SUBST
+
+all: itunesdb.o glibsubst.o
+
+clean:
+	rm -f *.o $(TARGET) 
+
+distclean:
+
+%.o : %.c %.h
+	$(CC) $(CFLAGS) -c $< -o $@

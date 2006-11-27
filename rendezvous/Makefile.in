@@ -1,0 +1,34 @@
+SHELL = @SHELL@
+CC = @CC@
+DEFS = @DEFS@
+LIBS = @LIBS@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+INSTALL = @INSTALL@
+top_srcdir = @top_srcdir@
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+
+CFLAGS += -Wall -DNOT_HAVE_SA_LEN
+
+TARGET = mDNSClient
+DESTDIR =
+
+all: $(TARGET)
+
+
+mDNSClient: mDNSPosix.o mDNSUNP.o ExampleClientApp.o mDNS.o Client.o
+	$(CC) $(LFLAGS) $^ -o $@
+
+install:
+	$(mkinstalldirs) $(DESTDIR)$(bindir)/
+	$(INSTALL) -s $(TARGET) $(DESTDIR)$(bindir)
+
+uninstall:
+	rm -f $(DESTDIR)$(bindir)/$(TARGET)
+
+clean:
+	rm -f $(TARGET) *.o
+
+distclean:
+

@@ -1,0 +1,15 @@
+*.log
+config.h
+config.h.in
+configure
+*.status
+raop_play-*
+index.html
+*.cache
+*-stamp
+*.gz
+*.dsc
+*.changes
+*.deb
+alsa_raoppcm.html
+*.ethreal

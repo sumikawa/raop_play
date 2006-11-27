@@ -1,0 +1,9 @@
+SUBDIRS = rendezvous raop_play aexcl
+
+all:
+	for i in $(SUBDIRS); do make -C $$i; done
+
+install uninstall clean:
+	for i in $(SUBDIRS); do make -C $$i $@; done
+
+distclean:

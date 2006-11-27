@@ -1,0 +1,47 @@
+SHELL = @SHELL@
+CC = @CC@
+DEFS = @DEFS@
+LIBS = @LIBS@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+INSTALL = @INSTALL@
+top_srcdir = @top_srcdir@
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+
+TARGET=raop_play
+DESTDIR =
+
+CFLAGS=-Wall
+OBJS := raop_play.o raop_client.o rtsp_client.o aexcl_lib.o base64.o aes.o m4a_stream.o \
+audio_stream.o wav_stream.o mp3_stream.o flac_stream.o ogg_stream.o aac_stream.o pls_stream.o \
+pcm_stream.o flac_stream.o
+
+all: $(TARGET)
+
+raop_play: $(OBJS)
+	$(CC) -o $@  -lssl -lsamplerate -lid3tag $^
+
+install:
+	$(mkinstalldirs) $(DESTDIR)$(bindir)/
+	$(INSTALL) -s $(TARGET) $(DESTDIR)$(bindir)
+
+uninstall:
+	rm -f $(DESTDIR)$(bindir)/$(TARGET)
+
+clean:
+	rm -f *.o $(TARGET)
+
+distclean:
+
+%.o : %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+COMMONE_HEADERS := aexcl_lib.h raop_play.h raop_client.h rtsp_client.h m4a_stream.h \
+pls_stream.h
+
+aexcl_lib.o: $(COMMONE_HEADERS)
+raop_play.o: $(COMMONE_HEADERS)
+raop_client.o: $(COMMONE_HEADERS)
+rtsp_client.o: $(COMMONE_HEADERS)
+m4a_stream.o: $(COMMONE_HEADERS)

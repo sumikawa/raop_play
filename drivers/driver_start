@@ -1,0 +1,11 @@
+#!/bin/sh
+module=alsa_raoppcm
+devnode=/tmp/pcmout
+if ! grep "^$module" /proc/modules > /dev/null; then
+    modprobe alsa_raoppcm
+fi
+major=`sed -n -r "s/(^[0-9]+) pcmout/\\1/p" /proc/devices`
+if [ -c $devnode ]; then
+    rm -f $devnode;
+fi
+mknod $devnode c $major 0

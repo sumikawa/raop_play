@@ -1,0 +1,68 @@
+ALSA driver for raop_play
+=========================
+
+Compile and Install:
+--------------------
+
+	Get source code and extract tar.gz file.
+	(the deb package doesn't include this module.)
+	
+	cd drivers
+	make
+	(become the root user)
+	make install
+
+
+How to play:
+------------
+
+	* Become the root user and run "driver_start" script, which is in "drivers" directory.
+	* Run "aexcl_play" and play "alsadev.pls", which is in "raop_play" direcotry.
+	* Then play any audio player which can be configured to use a user defined alsa device.
+	Most likely your alsa_raoppcm becomes the second sound device which is hw:1,0
+
+	e.g.
+	  * mplayer: mplayer -ao alsa:device=hw=1.0 song_file
+          * mpg321:  mpg321 -o alsa09 -a hw:1,0 song_file
+
+	If you don't want to use the gui, you can run raop_play from the command line, but
+	you need to know the ip address of your AEX.
+	  * raop_play your_aex_ip /tmp/pcmout
+
+	To use as KDE sound system, go to 'Control Center' - 'Sound System' - 'Hardware',
+	check 'Override device loaction' and set the device name like 'hw:1,0'
+
+
+Known issues:
+-------------
+
+	* Alsa controller is not yet written, so all controls from audio player software have
+	a big latency.
+
+	* Sometimes, a little noise at the top of play.
+
+	* Under bad network conditions, song play becomes somehow strange.
+
+	* need a small systray-kind of gui.
+
+	* kernel 2.4 is not yet supported.
+
+	* the final period of song data may not be transfered.
+
+
+Short description about the program:
+------------------------------------
+
+	alsa_raoppcm is a simple alsa pcm driver, which gets sound data from the upper alsa
+	layer and feed the data to a character device instead of audio hardware.
+
+	The character device is also created in the same driver and which has dynamically
+	assigned major node. It can be seen in /proc/devices once the module is successfully
+	installed.
+
+	raop_play reads pcm data from that character device.  When there is no data from the
+	device, raop_play keeps sending a small silent data and tries not to be disconnected.
+
+
+12/16/2005
+Shiro Ninomiya <shiron_AT_snino_DOT_com>

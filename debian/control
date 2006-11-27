@@ -1,0 +1,23 @@
+Source: raop-play
+Section: sound
+Priority: optional
+Maintainer: Shiro Ninomiya <shiron@snino.com>
+Build-Depends: libssl-dev, libfltk1.1-dev, libsamplerate0-dev, libid3tag0-dev
+Standards-Version: 0.5.1
+
+Package: raop-play
+Architecture: any
+Depends: ${shlibs:Depends}, mpg321, vorbis-tools
+Provides: aexcl_play, mDNSClient, raop_play
+Description: Apple Airport Express Client Player
+ raop-play is a music file player for Apple Airport Express.
+ How to run : aexcl_play [--ipod ipod_mount_point] [audio_data_directory]
+ (e.g. aexl_play --ipod /mnt/ipod /home/cat/audio_data).
+ This package consists of three programs: aexcl_play, raop_play and mDNSClient.
+ "aexcl_play" is 
+ a gui to manage raop_play and mDNSClient, and to browse music files.
+ "raop_play" is 
+ a command line program to send music data to the Airport Express
+ "mDNSClient" is 
+ an Apple rendezvous client program to discover accessible Airport Express.
+

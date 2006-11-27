@@ -1,0 +1,32 @@
+raop-play (0.5.1) testing; urgency=low
+  * flac is supported.
+  * fixed a problem in the new firmware to detect the end of playing.
+  * "alsa_raoppcm" fixed a busy loop issue of 'artsd'
+	
+ -- Shiro Ninomiya <shiron@snino.com>  Fri, 16 Dec 2005 08:00:00 -0700
+	
+raop-play (0.5.0) testing; urgency=low
+  * alsa pcm device module "alsa_raoppcm" is newly developed, now AEX can be 
+    the second second sound card. This is not in this deb package.
+  * added raw pcm data support
+  * added "--aexip ip_address" option for aexcl_play to play without mDNSClient
+  * cleaned up "differ in signedness" warning messages
+  * added utf16_strlen in itunesdb.c for bigendian machines.
+  * fixed ifreq size calculation in mDNSUNP.c for 64 bits architectures.
+  * mono support for wav and ogg
+	
+ -- Shiro Ninomiya <shiron@snino.com>  Thu, 1 Dec 2005 08:00:00 -0700
+	
+raop-play (0.4.4) testing; urgency=low
+  * Fixed a wrong sample rate issue for mp3 files which have id3tag.
+    Thanks to Jim Sproull.
+  * Support playlist (*.pls file)
+  * Supoort "http://*" type of filenames, and which are played as mp3 streams.
+
+ -- Shiro Ninomiya <shiron@snino.com>  Wed, 27 Jul 2005 08:00:00 -0700
+	
+raop-play (0.4.3) testing; urgency=low
+	
+  * the initial deb package relese
+
+ -- Shiro Ninomiya <shiron@snino.com>  Tue, 31 May 2005 11:01:08 -0700

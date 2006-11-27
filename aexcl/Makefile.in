@@ -1,0 +1,56 @@
+SHELL = @SHELL@
+CC = @CC@
+CXX = @CXX@
+DEFS = @DEFS@
+LIBS = @LIBS@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+FLUID = @FLUID@
+INSTALL = @INSTALL@
+top_srcdir = @top_srcdir@
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+
+TARGET=aexcl_play
+GLIB_SUBST=1 # remove this line, if you want to use libglib-2.0
+DESTDIR =
+
+CXXFLAGS += -Wall -D_GNU_SOURCE -I../raop_play -I../rendezvous
+GLIB = glib-2.0
+CXXFLAGS += -I/usr/include/$(GLIB) -I/usr/lib/$(GLIB)/include
+CFLAGS += -Wall -I/usr/include/$(GLIB) -I/usr/lib/$(GLIB)/include -I../raop_play
+
+ifdef GLIB_SUBST
+  GLIB_SUBST_OBJ = ipod/glibsubst.o
+  CFLAGS += -DGLIB_SUBST
+else
+  GLIB_LINK = -lglib-2.0
+endif
+
+all: $(TARGET)
+
+$(TARGET): aexcl_gui.o aexcl_play.o ipod_browser.o ../raop_play/aexcl_lib.o ipod/itunesdb.o $(GLIB_SUBST_OBJ)
+	$(CXX) -o $@  $^ -lfltk $(GLIB_LINK)
+
+install:
+	$(mkinstalldirs) $(DESTDIR)$(bindir)/
+	$(INSTALL) -s $(TARGET) $(DESTDIR)$(bindir)
+
+uninstall:
+	rm -f $(DESTDIR)$(bindir)/$(TARGET)
+
+clean:
+	make -C ipod clean
+	rm -f *.o $(TARGET) 
+
+distclean:
+
+%.o : %.c %.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+%.o : %.cxx
+	$(CXX) $(CXXFLAGS) -c $<
+
+.SUFFIXES: .fl .cxx .h
+.fl.h .fl.cxx:
+	$(FLUID) -c $<

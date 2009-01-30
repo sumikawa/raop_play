@@ -53,6 +53,7 @@ auds_t *auds_open(char *fname, data_type_t adt)
 		auds->data_type=get_data_type(fname);
 	else
 		auds->data_type=adt;
+	DBGMSG("audio data type: %d\n", auds->data_type);
 	switch(auds->data_type){
 	case AUD_TYPE_ALAC:
 		rval=m4a_open(auds,fname);
@@ -87,7 +88,10 @@ auds_t *auds_open(char *fname, data_type_t adt)
 		ERRMSG("unknown audio data type\n");
 		break;
 	}
-	if(rval) goto erexit;
+	if(rval) {
+		ERRMSG("return value from xxx_open: %d\n", rval);
+		goto erexit;
+	}
 	if(auds->sample_rate != DEFAULT_SAMPLE_RATE){
 		auds->resamp_st=src_new(SRC_SINC_FASTEST, auds->channels, &err);
 		if(!auds->resamp_st) {
@@ -98,8 +102,10 @@ auds_t *auds_open(char *fname, data_type_t adt)
 		auds->resamp_sd.data_in=(float *)malloc(sizeof(float)*MAX_SAMPLES_IN_CHUNK*2);
 		auds->resamp_sd.data_out=(float *)malloc(sizeof(float)*MAX_SAMPLES_IN_CHUNK*2);
 		auds->resamp_sd.src_ratio=(double)DEFAULT_SAMPLE_RATE/(double)auds->sample_rate;
-		if(!auds->resamp_buf || !auds->resamp_sd.data_in || !auds->resamp_sd.data_out)
+		if(!auds->resamp_buf || !auds->resamp_sd.data_in || !auds->resamp_sd.data_out) {
+			ERRMSG("error with resamp buffers\n");
 			goto erexit;
+		}
 	}
 	return auds;
  erexit:

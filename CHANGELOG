@@ -1,4 +1,10 @@
 "aexcl_play" by Shiro Ninomiya <shiron_AT_snino_DOT_com>
+				and Nils Winkler <nwinkler_AT_users_DOT_sourceforge_DOT_net>
+				
+XX/XX/2008 Ver 0.5.2
+	* applied patch to not depend on linux/config.h anymore
+	* applied patch to deal with Kernel > 2.6.21
+	* changed install location of alsa module from 'sound' to 'extra', since this is supported by dkms
 
 12/16/2005 Ver 0.5.1
 	* fixed a problem in the new firmware to detect the end of playing.
@@ -20,7 +26,7 @@
 	* Fixed a wrong sample rate issue for mp3 files which have id3tag.
 	  Thanks to Jim Sproull.
         * Support playlist (*.pls file)
-        * Supoort "http://*" type of filenames, and which are played as mp3 streams.
+        * Support "http://*" type of filenames, and which are played as mp3 streams.
 
 5/29/2005 Ver 0.4.3
 	Now this can play the following data type

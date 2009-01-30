@@ -1,4 +1,4 @@
-SUBDIRS = rendezvous raop_play aexcl
+SUBDIRS = rendezvous raop_play aexcl drivers
 
 all:
 	for i in $(SUBDIRS); do make -C $$i; done

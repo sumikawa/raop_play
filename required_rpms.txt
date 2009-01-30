@@ -1,0 +1,6 @@
+fltk-fluid fltk fltk-devel
+libid3tag libid3tag-devel
+libsamplerate libsamplerate-devel
+openssl openssl-devel
+glib2-devel
+

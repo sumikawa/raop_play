@@ -1,7 +1,5 @@
 *.log
 config.h
-config.h.in
-configure
 *.status
 raop_play-*
 index.html
@@ -13,3 +11,4 @@ index.html
 *.deb
 alsa_raoppcm.html
 *.ethreal
+Makefile

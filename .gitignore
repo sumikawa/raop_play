@@ -1,7 +1,5 @@
 *.log
 config.h
-config.h.in
-configure
 *.status
 raop_play-*
 index.html

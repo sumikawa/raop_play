@@ -32,12 +32,20 @@
 #include "aexcl_lib.h"
 
 
+#if (GLIB_MAJOR_VERSION == 2 && GLIB_MINOR_VERSION < 16)
 inline gpointer g_malloc(gulong size)
+#else
+inline gpointer g_malloc(gsize size)
+#endif
 {
 	return malloc(size);
 }
 
+#if (GLIB_MAJOR_VERSION == 2 && GLIB_MINOR_VERSION < 16)
 inline gpointer g_malloc0(gulong size)
+#else
+inline gpointer g_malloc0(gsize size)
+#endif
 {
 	gpointer p;
 	if((p=malloc(size))) memset(p,0,size);

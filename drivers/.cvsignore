@@ -1,6 +1,8 @@
+*.symvers
 *.cmd
 *.ko
 *.mod.c
 .tmp_versions
 pcm_test*
 nouse
+Makefile

@@ -29,7 +29,7 @@
 |
 |  This product is not supported/written/published by Apple!
 |
-|  $Id: itunesdb.h,v 1.1.1.1 2005/07/23 13:57:04 shiro Exp $
+|  $Id: itunesdb.h,v 1.1.1.1 2007/08/26 20:42:57 nwinkler Exp $
 */
 
 #ifndef __ITUNESDB_H__

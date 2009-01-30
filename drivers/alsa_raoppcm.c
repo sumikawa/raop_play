@@ -1,6 +1,7 @@
 /*****************************************************************************
  * alsa_raoppcm.c: alsa pcm driver to bridge to raop_play
- * Copyright (C) 2005 Shiro Ninomiya <shiron@snino.com>
+ * Copyright (C) 2008 Shiro Ninomiya <shiron@snino.com>, 
+ * 						Nils Winkler <nwinkler@users.sourceforge.net>
  * 
  * Reference article:
  *   http://alsa-project.org/~iwai/writing-an-alsa-driver/index.html
@@ -20,18 +21,20 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-#include <linux/config.h>
+#include <linux/autoconf.h>
 #include <linux/poll.h>
 #include <sound/driver.h>
 #include <sound/core.h>
 #include <sound/pcm.h>
 
+#include "alsa_raoppcm_version.h"
+
 static DECLARE_WAIT_QUEUE_HEAD(pcmout_read_wait);
 
 typedef struct raoppcm_t{
-	snd_card_t *card;
-	snd_pcm_substream_t *substream;
-	snd_pcm_t *pcm;
+	struct snd_card *card;
+	struct snd_pcm_substream *substream;
+	struct snd_pcm *pcm;
 	int running;
 	int readp;
 }raoppcm_t;
@@ -40,7 +43,7 @@ static raoppcm_t *raoppcm_data;
 #define chip_t raoppcm_t
 
 /* hardware definition */
-static snd_pcm_hardware_t snd_raoppcm_playback_hw = {
+static struct snd_pcm_hardware snd_raoppcm_playback_hw = {
 	.info = (SNDRV_PCM_INFO_INTERLEAVED),
 	.formats =          SNDRV_PCM_FMTBIT_S16_LE,
 	.rates =            SNDRV_PCM_RATE_44100,
@@ -56,9 +59,9 @@ static snd_pcm_hardware_t snd_raoppcm_playback_hw = {
 };
 
 /* open callback */
-static int snd_raoppcm_playback_open(snd_pcm_substream_t *substream)
+static int snd_raoppcm_playback_open(struct snd_pcm_substream *substream)
 {
-	snd_pcm_runtime_t *runtime = substream->runtime;
+	struct snd_pcm_runtime *runtime = substream->runtime;
 	raoppcm_t *chip = snd_pcm_substream_chip(substream);
 
 	printk(KERN_DEBUG "%s\n",__func__);
@@ -68,7 +71,7 @@ static int snd_raoppcm_playback_open(snd_pcm_substream_t *substream)
 }
 
 /* close callback */
-static int snd_raoppcm_playback_close(snd_pcm_substream_t *substream)
+static int snd_raoppcm_playback_close(struct snd_pcm_substream *substream)
 {
 	raoppcm_t *chip = snd_pcm_substream_chip(substream);
 	chip->substream=NULL;
@@ -77,8 +80,8 @@ static int snd_raoppcm_playback_close(snd_pcm_substream_t *substream)
 }
 
 /* hw_params callback */
-static int snd_raoppcm_pcm_hw_params(snd_pcm_substream_t *substream,
-				     snd_pcm_hw_params_t *hw_params)
+static int snd_raoppcm_pcm_hw_params(struct snd_pcm_substream *substream,
+				     struct snd_pcm_hw_params *hw_params)
 {
 	raoppcm_t *chip = snd_pcm_substream_chip(substream);
 	printk(KERN_DEBUG "%s\n",__func__);
@@ -88,21 +91,21 @@ static int snd_raoppcm_pcm_hw_params(snd_pcm_substream_t *substream,
 }
 
 /* hw_free callback */
-static int snd_raoppcm_pcm_hw_free(snd_pcm_substream_t *substream)
+static int snd_raoppcm_pcm_hw_free(struct snd_pcm_substream *substream)
 {
 	printk(KERN_DEBUG "%s\n",__func__);
 	return snd_pcm_lib_free_pages(substream);
 }
 
 /* prepare callback */
-static int snd_raoppcm_pcm_prepare(snd_pcm_substream_t *substream)
+static int snd_raoppcm_pcm_prepare(struct snd_pcm_substream *substream)
 {
 	printk(KERN_DEBUG "%s\n",__func__);
 	return 0;
 }
 
 /* trigger callback */
-static int snd_raoppcm_pcm_trigger(snd_pcm_substream_t *substream,
+static int snd_raoppcm_pcm_trigger(struct snd_pcm_substream *substream,
 				  int cmd)
 {
 	raoppcm_t *chip = snd_pcm_substream_chip(substream);
@@ -126,9 +129,9 @@ static int snd_raoppcm_pcm_trigger(snd_pcm_substream_t *substream,
 }
 
 /* pointer callback */
-static snd_pcm_uframes_t snd_raoppcm_pcm_pointer(snd_pcm_substream_t *substream)
+static snd_pcm_uframes_t snd_raoppcm_pcm_pointer(struct snd_pcm_substream *substream)
 {
-	snd_pcm_runtime_t *runtime = substream->runtime;
+	struct snd_pcm_runtime *runtime = substream->runtime;
 	raoppcm_t *chip = snd_pcm_substream_chip(substream);
 	//printk(KERN_DEBUG "%s readp=0x%x, 0x%x\n",__func__,chip->readp, (int)bytes_to_frames(runtime, chip->readp));
 	wake_up(&pcmout_read_wait);
@@ -136,7 +139,7 @@ static snd_pcm_uframes_t snd_raoppcm_pcm_pointer(snd_pcm_substream_t *substream)
 }
 
 /* operators */
-static snd_pcm_ops_t snd_raoppcm_playback_ops = {
+static struct snd_pcm_ops snd_raoppcm_playback_ops = {
 	.open =        snd_raoppcm_playback_open,
 	.close =       snd_raoppcm_playback_close,
 	.ioctl =       snd_pcm_lib_ioctl,
@@ -150,7 +153,7 @@ static snd_pcm_ops_t snd_raoppcm_playback_ops = {
 /* create a pcm device */
 static int __devinit snd_raoppcm_new_pcm(raoppcm_t *chip)
 {
-	snd_pcm_t *pcm;
+	struct snd_pcm *pcm;
 	int err;
 
 	if ((err = snd_pcm_new(chip->card, "raop pcm", 0, 1, 0, &pcm)) < 0) 
@@ -177,7 +180,7 @@ static int pcmout_major;
 
 static ssize_t pcmout_read(struct file *file, char *buffer, size_t count, loff_t * ppos)
 {
-	snd_pcm_runtime_t *runtime;
+	struct snd_pcm_runtime *runtime;
 	int period_bytes, size_tob;
 
 	if(!raoppcm_data) {
@@ -209,14 +212,17 @@ static ssize_t pcmout_read(struct file *file, char *buffer, size_t count, loff_t
 
 	size_tob=runtime->dma_bytes-raoppcm_data->readp;
 	if(size_tob>=count){
-		copy_to_user(buffer, runtime->dma_area+raoppcm_data->readp, count);
+		if(copy_to_user(buffer, runtime->dma_area+raoppcm_data->readp, count))
+			return -EFAULT;
 		raoppcm_data->readp+=count;
 		if(raoppcm_data->readp==runtime->dma_bytes) raoppcm_data->readp=0;
 		snd_pcm_period_elapsed(raoppcm_data->substream);
 		return count;
 	}
-	copy_to_user(buffer, runtime->dma_area+raoppcm_data->readp, size_tob);
-	copy_to_user(buffer+size_tob, runtime->dma_area, count-size_tob);
+	if(copy_to_user(buffer, runtime->dma_area+raoppcm_data->readp, size_tob))
+		return -EFAULT;
+	if(copy_to_user(buffer+size_tob, runtime->dma_area, count-size_tob))
+		return -EFAULT;
 	raoppcm_data->readp=count-size_tob;
 	snd_pcm_period_elapsed(raoppcm_data->substream);
 	return count;
@@ -225,7 +231,7 @@ static ssize_t pcmout_read(struct file *file, char *buffer, size_t count, loff_t
 static unsigned int pcmout_poll(struct file *file, poll_table * wait)
 {
 	unsigned int mask=0;
-	snd_pcm_runtime_t *runtime=NULL;
+	struct snd_pcm_runtime *runtime=NULL;
 	if(raoppcm_data->substream) runtime=raoppcm_data->substream->runtime;
 	poll_wait(file, &pcmout_read_wait, wait);
 	if(!raoppcm_data->running) return 0;
@@ -269,12 +275,12 @@ static int pcmout_creaup(void)
 static int __init alsa_raoppcm_init(void)
 {
 	int err;
-	snd_card_t *card;
+	struct snd_card *card;
 
 	card = snd_card_new(-1, "raoppcm", THIS_MODULE, sizeof(raoppcm_t));
 	if (card == NULL)
 		return -ENOMEM;
-	raoppcm_data=(raoppcm_t*)((size_t)card+sizeof(snd_card_t));
+	raoppcm_data=(raoppcm_t*)((size_t)card+sizeof(struct snd_card));
 	raoppcm_data->card = card;
 	card->private_data = NULL;
 	card->private_free = NULL;
@@ -287,7 +293,7 @@ static int __init alsa_raoppcm_init(void)
 
 	if ((err = snd_card_register(card))) goto erexit;
 	if ((err = pcmout_init())) goto erexit;
-	printk( KERN_DEBUG "ALSA RAOPPCM dirver is initialized\n");
+	printk( KERN_DEBUG "ALSA RAOPPCM driver is initialized\n");
 	return 0;
 
  erexit:
@@ -304,6 +310,6 @@ static void __exit alsa_raoppcm_exit(void)
 module_init(alsa_raoppcm_init);
 module_exit(alsa_raoppcm_exit);
 
-MODULE_LICENSE("GPL");
-MODULE_DESCRIPTION("PCM audio data bridge to raop_play");
-MODULE_AUTHOR("Shiro Ninomiya");
+MODULE_LICENSE( DRIVER_LICENSE );
+MODULE_DESCRIPTION( DRIVER_INFO );
+MODULE_AUTHOR( DRIVER_AUTHOR );

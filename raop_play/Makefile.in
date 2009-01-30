@@ -37,11 +37,11 @@ distclean:
 %.o : %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-COMMONE_HEADERS := aexcl_lib.h raop_play.h raop_client.h rtsp_client.h m4a_stream.h \
+COMMON_HEADERS := aexcl_lib.h raop_play.h raop_client.h rtsp_client.h m4a_stream.h \
 pls_stream.h
 
-aexcl_lib.o: $(COMMONE_HEADERS)
-raop_play.o: $(COMMONE_HEADERS)
-raop_client.o: $(COMMONE_HEADERS)
-rtsp_client.o: $(COMMONE_HEADERS)
-m4a_stream.o: $(COMMONE_HEADERS)
+aexcl_lib.o: $(COMMON_HEADERS)
+raop_play.o: $(COMMON_HEADERS)
+raop_client.o: $(COMMON_HEADERS)
+rtsp_client.o: $(COMMON_HEADERS)
+m4a_stream.o: $(COMMON_HEADERS)
